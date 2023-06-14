@@ -3,6 +3,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import User from '../../../../models/user';
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDB } from '../../../../utils/database';
+import bcrypt from 'bcrypt'
 
 const handler = NextAuth({
     providers: [
@@ -18,21 +19,32 @@ const handler = NextAuth({
             },
 
             async authorize(credentials, req) {
+                const { email, password } = credentials;
 
-                const res = await fetch("/api/register", {
-                    method: 'POST',
-                    body: JSON.stringify(credentials),
-                    headers: { "Content-Type": "application/json" }
-                })
-                const user = await res.json()
+                try {
+                    // connect to DB
+                    await connectToDB();
 
-                // If no error and we have user data, return it
-                if (res.ok && user) {
+                    // check if user already exists
+                    const user =await User.findOne({ email });
+                    if(!user) {
+                        return false
+                    }
+
+                    // check if password is correct
+                    const passwordCorrect = await bcrypt.compare(password, user.password);
+
+                    if(!passwordCorrect) {
+                        return false
+                    }
+
                     return user
+
+                } catch (error) {
+                    console.log("Error checking if user exists: ", error.message);
+                    return false
                 }
-                // Return null if user data could not be retrieved
-                return null
-            }
+                }  
 
         }),
     ],
@@ -44,28 +56,31 @@ const handler = NextAuth({
 
             return session;
         },
-        async signIn({ account, profile, user, credentials }) {
-            try {
-                await connectToDB();
+        // async signIn({ account, profile, user, credentials }) {
+        //     try {
+        //         await connectToDB();
 
-                // check if user already exists
-                const userExists = await User.findOne({ email: profile.email });
+        //         // check if user already exists
+        //         const userExists = await User.findOne({ email: profile.email });
 
-                // if not, create a new document and save user in MongoDB
-                if (!userExists) {
-                    await User.create({
-                        email: profile.email,
-                        username: profile.name.replace(" ", "").toLowerCase(),
-                        image: profile.picture,
-                    });
-                }
+        //         // if not, create a new document and save user in MongoDB
+        //         if (!userExists) {
+        //             await User.create({
+        //                 email: profile.email,
+        //                 username: profile.name.replace(" ", "").toLowerCase(),
+        //                 image: profile.picture,
+        //             });
+        //         }
 
-                return true
-            } catch (error) {
-                console.log("Error checking if user exists: ", error.message);
-                return false
-            }
-        },
+        //         return true
+        //     } catch (error) {
+        //         console.log("Error checking if user exists: ", error.message);
+        //         return false
+        //     }
+        // },
+    },
+    session : {
+        jwt: true,
     }
 })
 
