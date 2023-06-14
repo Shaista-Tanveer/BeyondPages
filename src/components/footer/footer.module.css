@@ -1,0 +1,60 @@
+/* footer.module.css */
+
+.footerContainer {
+  background-color: #f2f2f2; /* Light gray background color */
+  padding: 20px;
+}
+
+.footerColumns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; /* Add space between the columns */
+}
+
+.footerColumn {
+  flex-basis: 33.33%; /* Set each column to occupy 1/3 of the width */
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the content vertically */
+}
+
+.footerColumn h5 {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.socialAccounts {
+  list-style-type: none;
+  padding: 0;
+  text-align: center; /* Center the social accounts horizontally */
+}
+
+.socialAccounts li {
+  margin-bottom: 5px;
+}
+
+.pageLinks {
+  list-style-type: none;
+  padding: 0;
+  text-align: center; /* Center the page links horizontally */
+}
+
+.pageLinks li {
+  margin-bottom: 5px;
+}
+
+.footerCopyRight {
+  margin-top: 20px;
+  text-align: center;
+  color: #666666; /* Dark gray text color */
+}
+
+/* Media Queries */
+
+@media (max-width: 767px) {
+  .footerColumn {
+    flex-basis: 100%; /* Set each column to occupy 100% of the width */
+  }
+}
