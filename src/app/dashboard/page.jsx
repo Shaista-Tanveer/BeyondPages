@@ -4,7 +4,10 @@ import Link from 'next/link';
 import styles from './dashboard.module.css'; // Import the CSS file
 import { signIn, signOut, useSession, getProviders } from 'next-auth/react';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
 const Dashboard = () => {
+  const router = useRouter();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -13,19 +16,35 @@ const Dashboard = () => {
   const handleRegister = async (e) => {
     
     e.preventDefault();
-    signIn("credentials", {
-      redirect: false,
-      email: email,
-      password:password,
-    }).then((callback) => {
-      if (callback?.error) {
-        // toast.error(callback.error);
-         
-      } else if (callback?.ok) {
-        // toast.success("Logged in");
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        fullName,
+        email,
+        password,
+      })
+    }).then((res) => res.json());
+
+
+    if(res.status === "ok"){
+     
+      signIn("credentials", {
+        redirect: false,
+        email: email,
+        password:password,
+      }).then((res) => {
+
+        if(res.error){
+          alert(res.error);
+        }
+        else{
+          router.push("/");
+        }
+      });
       }
-      // setIsLoading(false);
-    });
+      else{
+        alert(res.error);
+      }
   };
   
   const handleGoogleSignUp = () => {
