@@ -36,10 +36,8 @@ const AdminDashboard = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch blogs data from the server or API
     const fetchData = async () => {
       try {
-        // Make an API request to fetch blogs data
         const response = await fetch('/api/blogs');
         const data = await response.json();
         setBlogs(data);
@@ -50,6 +48,7 @@ const AdminDashboard = () => {
 
     fetchData();
   }, []);
+
 
   const handleEdit = (blogId) => {
     // Find the selected blog from the blogs list
@@ -64,17 +63,19 @@ const AdminDashboard = () => {
         router.push('/admin/add?edit=true&id=' + blogId);
       }, 0);
     }
-  };
+  
 
   const handleDelete = (blogId) => {
-    // Handle delete action
     console.log('Delete blog:', blogId);
   };
 
   return (
     <div>
       <h1>Admin Dashboard</h1>
-      <Link href="/admin/addBlog">Create Blog</Link>
+      <Button>
+        <Link href="/admin/addBlog" className={styles.button}>Create Blog</Link>
+      </Button>
+
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -93,7 +94,7 @@ const AdminDashboard = () => {
               <td>{blog.description}</td>
               <td>{blog.hashtags}</td>
               <td>
-                <Button onClick={() => handleEdit(blog._id)}>Edit</Button>
+                <Button onClick={() => handleEdit(blog)}>Edit</Button>
                 <Button onClick={() => handleDelete(blog._id)}>Delete</Button>
               </td>
             </tr>

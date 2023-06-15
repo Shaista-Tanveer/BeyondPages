@@ -145,25 +145,21 @@ const AddBlogPage = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const formData = new FormData();
       formData.append('title', title);
       formData.append('description', description);
       formData.append('hashtags', hashtags);
       images.forEach((image, index) => {
-        formData.append('images', image);
+        formData.append(`images-${index}`, image);
       });
-
+  
       const response = await fetch('/api/createBlog', {
-                method: "POST",
-                body: JSON.stringify({
-                  title,
-                  description,
-                  hashtags,
-                }),
-              });
-
+        method: 'POST',
+        body: formData,
+      });
+  
       if (response.ok) {
         // Blog created successfully, handle the response
         console.log('Blog created successfully');
@@ -176,7 +172,8 @@ const AddBlogPage = () => {
       console.log('Error creating blog:', error.message);
     }
   };
-
+  
+  
   return (
     <div className={styles.container}>
       <h2>Create Blog</h2>

@@ -3,7 +3,7 @@ import User from '../../../../models/user'
 import bcrypt from 'bcrypt'
 
 export const POST = async (request) => {
-  const { fullName, email, password } = await request.json()
+  const { username, email, password } = await request.json()
 
   try {
     await connectToDB()
@@ -23,17 +23,17 @@ export const POST = async (request) => {
 
     // Create a new user document and save it to the database
     await User.create({
-      fullName,
+      username,
       email,
-      password : await bcrypt.hash(password, 10),
-      username: email.split('@')[0],
+      password: await bcrypt.hash(password, 10),
+      // username: email.split('@')[0],
       usertype: 'user',
     })
 
     return new Response(
-      JSON.stringify({ 
-      message: 'User created successfully',
-      status : "ok"
+      JSON.stringify({
+        message: 'User created successfully',
+        status: "ok"
       }),
     )
   } catch (error) {
