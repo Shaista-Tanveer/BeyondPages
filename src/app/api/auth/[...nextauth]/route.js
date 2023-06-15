@@ -26,15 +26,15 @@ const handler = NextAuth({
                     await connectToDB();
 
                     // check if user already exists
-                    const user =await User.findOne({ email });
-                    if(!user) {
+                    const user = await User.findOne({ email });
+                    if (!user) {
                         return false
                     }
 
                     // check if password is correct
                     const passwordCorrect = await bcrypt.compare(password, user.password);
 
-                    if(!passwordCorrect) {
+                    if (!passwordCorrect) {
                         return false
                     }
 
@@ -44,7 +44,7 @@ const handler = NextAuth({
                     console.log("Error checking if user exists: ", error.message);
                     return false
                 }
-                }  
+            }
 
         }),
     ],
@@ -56,30 +56,30 @@ const handler = NextAuth({
 
             return session;
         },
-        // async signIn({ account, profile, user, credentials }) {
-        //     try {
-        //         await connectToDB();
+        async signIn({ account, profile, user, credentials }) {
+            try {
+                await connectToDB();
 
-        //         // check if user already exists
-        //         const userExists = await User.findOne({ email: profile.email });
+                // check if user already exists
+                const userExists = await User.findOne({ email: profile.email });
 
-        //         // if not, create a new document and save user in MongoDB
-        //         if (!userExists) {
-        //             await User.create({
-        //                 email: profile.email,
-        //                 username: profile.name.replace(" ", "").toLowerCase(),
-        //                 image: profile.picture,
-        //             });
-        //         }
+                // if not, create a new document and save user in MongoDB
+                if (!userExists) {
+                    await User.create({
+                        email: profile.email,
+                        username: profile.name.replace(" ", "").toLowerCase(),
+                        image: profile.picture,
+                    });
+                }
 
-        //         return true
-        //     } catch (error) {
-        //         console.log("Error checking if user exists: ", error.message);
-        //         return false
-        //     }
-        // },
+                return true
+            } catch (error) {
+                console.log("Error checking if user exists: ", error.message);
+                return false
+            }
+        },
     },
-    session : {
+    session: {
         jwt: true,
     }
 })

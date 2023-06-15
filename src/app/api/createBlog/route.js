@@ -7,50 +7,51 @@
 //     try {
 //         await connectToDB();
 //         const newPrompt = new Blog({ title, description, hashtags });
-//         const newBlog = await newPrompt.save();
-//         return new Response(JSON.stringify(newPrompt), { status: 201 })
+//         const savedBlog = await newPrompt.save();
+//         return new Response(JSON.stringify(savedBlog), { status: 201 })
 //     } catch (error) {
 //         return new Response("Failed to create a new prompt", { status: 500 });
 //     }
 // } 
 
-
-
-
 import { connectToDB } from '../../../utils/database';
-import multer from 'multer';
 import Blog from '../../../models/Blogs';
+import { upload } from '../../../utils/multer';
 
-// const storage = multer.diskStorage({
-//     destination: './public/uploads/',
-//     filename: (req, file, cb) => {
-//         cb(null, Date.now() + '_' + file.originalname);
-//     },
-// });
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
 
-// const upload = multer({ storage });
-
-// export const config = {
-//     api: {
-//         bodyParser: false,
-//     },
-// };
-
-// export const uploadMiddleware = upload.single('image');
-
-export const POST = async (req, res) => {
-    const { title, description, hashtags } = await request.json()
-    console.log(title, description, hashtags);
+export const POST = async () => {
     try {
-        await connectToDB();
-        const newBlog = new Blog({ title, description, hashtags });
-        // if (req.file) {
-        //     newBlog.image = req.file.path;
-        // }
-        const savedBlog = await newBlog.save();
-        return new Response(JSON.stringify(savedBlog), { status: 201 })
+        await upload().array('images')(async (error) => {
+            if (error instanceof multer.MulterError) {
+                console.log(error.message);
+                // return res.status(400).json({ error: error.message });
+            } else if (error) {
+                console.log(error);
+                // return res.status(500).json({ error: 'Internal server error' });
+            }
+
+            const { title, description, hashtags } = req.body;
+            const images = req.files.map((file) => file.path);
+
+            try {
+                await connectToDB();
+
+                const newBlog = new Blog({ title, description, hashtags, images });
+                const savedBlog = await newBlog.save();
+                console.log(savedBlog, "savedBlog");
+                // return res.status(201).json(savedBlog);
+            } catch (error) {
+                console.log(error);
+                // return res.status(500).json({ error: 'Failed to create a new blog' });
+            }
+        });
     } catch (error) {
-        console.log(error, "whats the error");
-        return new Response("Failed to create a new prompt", { status: 500 });
+        console.log(error);
+        // return res.status(500).json({ error: 'Failed to process the request' });
     }
 };

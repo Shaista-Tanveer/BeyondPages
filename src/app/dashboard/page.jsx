@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 const Dashboard = () => {
   const router = useRouter();
 
-  const [fullName, setFullName] = useState('');
+  const [username, setusername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -19,7 +19,7 @@ const Dashboard = () => {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify({
-        fullName,
+        username,
         email,
         password,
       })
@@ -57,7 +57,7 @@ const Dashboard = () => {
       <div className={styles.registerSection}>
         <h2>Create an Account</h2>
         <form onSubmit={handleRegister}>
-          <input type="text" placeholder="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+          <input type="text" placeholder="Full Name" value={username} onChange={(e) => setusername(e.target.value)} />
           <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
           <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
           <button type="submit">Register</button>
