@@ -18,7 +18,7 @@
 
 
 import { connectToDB } from '../../../utils/database';
-import multer from 'multer';
+// import multer from 'multer';
 import Blog from '../../../models/Blogs';
 
 // const storage = multer.diskStorage({
@@ -38,7 +38,7 @@ import Blog from '../../../models/Blogs';
 
 // export const uploadMiddleware = upload.single('image');
 
-export const POST = async (req, res) => {
+export const POST = async (request, res) => {
     const { title, description, hashtags } = await request.json()
     console.log(title, description, hashtags);
     try {

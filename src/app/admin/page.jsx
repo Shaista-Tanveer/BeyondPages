@@ -57,10 +57,11 @@ const AdminDashboard = () => {
     if (selectedBlog) {
       // Delay the router push until the component is mounted
       setTimeout(() => {
-        router.push({
-          pathname: '/admin/addBlog',
-          query: { edit: true, id: blogId },
-        });
+        // router.push({
+        //   pathname: '/admin/addBlog',
+        //   query: { edit: true, id: blogId },
+        // });
+        router.push('/admin/add?edit=true&id=' + blogId);
       }, 0);
     }
   };
