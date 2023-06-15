@@ -15,6 +15,9 @@
 // } 
 
 import { connectToDB } from '../../../utils/database';
+
+// import multer from 'multer';
+
 import Blog from '../../../models/Blogs';
 import { upload } from '../../../utils/multer';
 
@@ -24,7 +27,11 @@ export const config = {
     },
 };
 
-export const POST = async () => {
+
+export const POST = async (request, res) => {
+    const { title, description, hashtags } = await request.json()
+    console.log(title, description, hashtags);
+
     try {
         await upload().array('images')(async (error) => {
             if (error instanceof multer.MulterError) {

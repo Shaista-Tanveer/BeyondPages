@@ -49,10 +49,20 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  const handleEdit = (post) => {
-    router.push(`/admin/addBlog?id=${post}`);
-  };
 
+  const handleEdit = (blogId) => {
+    // Find the selected blog from the blogs list
+    const selectedBlog = blogs.find((blog) => blog._id === blogId);
+    if (selectedBlog) {
+      // Delay the router push until the component is mounted
+      setTimeout(() => {
+        // router.push({
+        //   pathname: '/admin/addBlog',
+        //   query: { edit: true, id: blogId },
+        // });
+        router.push('/admin/add?edit=true&id=' + blogId);
+      }, 0);
+    }
   
 
   const handleDelete = (blogId) => {
