@@ -2,14 +2,81 @@
   padding: 20px;
 }
 
-.options {
+.headerRow {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-.button {
+.adminDashboardTitle {
+  padding-right: 22px;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+
+.newBlogButton {
+  background-color: #cbe2ff;
+  border: none;
+  color: white;
   padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
   font-size: 16px;
-  color: aliceblue;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.newBlogButton:hover {
+  background-color: #cbf0ff;
+}
+
+.linkButton {
+  text-decoration: none;
+  color: black;
+}
+
+.tableName {
+  font-size: 20px;
+  margin-top: 20px;
+  text-transform: uppercase;
+}
+
+.table {
+  margin: 0 auto;
+  text-align: justify;
+}
+
+.tableName {
+  display: flex;
+  align-items: center;
+}
+
+.tableName input {
+  margin-left: 40px; /* Add some spacing between the input and the table name */
+}
+
+.pagination {
+  display: flex;
+  justify-content: center; /* Center align the pagination */
+  margin-top: 20px;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.editButton {
+  background-color: #6ab4f5;
+  color: white;
+  border-color: #6ab4f5;
+}
+
+.deleteButton {
+  background-color: #f56a6a;
+  border-color: #f56a6a;
+  color: white;
 }

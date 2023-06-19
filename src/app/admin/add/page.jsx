@@ -1,16 +1,13 @@
 "use client"
 
-
 import React, { useEffect, useState } from 'react';
-import styles from './addBlog.module.css';
+import styles from './addblog.module.css';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'next/navigation';
 import getBlog from '../../actions/getBlog';
-
+import { Toaster, toast } from 'react-hot-toast';
 const AddBlogPage = () => {
-  const { register, handleSubmit, watch,
-      setValue,
-    formState: { errors } } = useForm({
+  const { register, handleSubmit, watch,setValue,formState: { errors } } = useForm({
     defaultValues: {
       title: '',
       description: '',
@@ -20,7 +17,7 @@ const AddBlogPage = () => {
   const params = useSearchParams();
   const [images, setImages] = useState([]);
   const isEdit = params.get('edit') === 'true';
-
+console.log(isEdit,"isEdit");
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -37,39 +34,41 @@ const AddBlogPage = () => {
   const handleFormSubmit = async (data) => {
     try {
       const { title, description, hashtags } = data;
-      const formData = new FormData();
-      formData.append('title',title );
-      formData.append('description', description);
-      formData.append('hashtags', hashtags);
-      // images.forEach((image, index) => {
-      //   formData.append('images', image);
-      // });
-
-      const response = await fetch('/api/createBlog', {
-                method: "POST",
-                body: JSON.stringify({
-                  title,
-                  description,
-                  hashtags,
-                }),
-              });
-
-      if (response.ok) {
-        // Blog created successfully, handle the response
-        console.log('Blog created successfully');
+  
+      const requestOptions = {
+        method: isEdit ? 'PATCH' : 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Set the content type header
+        },
+        body: JSON.stringify({ title, description, hashtags }),
+      };
+  
+      if (isEdit) {
+        const id = params.get('id');
+        const response = await fetch(`/api/blogs/${id}`, requestOptions);
+  
+        if (response.ok) {
+          toast.success('Blog Edited');
+        } else {
+          toast.error('Blog Edit Failed..!');
+        }
       } else {
-        // Blog creation failed, handle the error
-        console.log('Blog creation failed');
+        const response = await fetch('/api/createBlog', requestOptions);
+  
+        if (response.ok) {
+          toast.success('Blog Created');
+        } else {
+          toast.error('Blog Creation Failed..!');
+        }
       }
     } catch (error) {
-      // Error occurred while making the API hit, handle the error
-      console.log('Error creating blog:', error.message);
+      toast.error(error.message);
     }
   };
-
+  
+  
 useEffect(() => {
     if (isEdit) {
-      // Fetch the blog details from the API
       const blogId = params.get('id');
       (
         async () => {
@@ -85,7 +84,9 @@ useEffect(() => {
 }, [params]);
 
   return (
+  
     <div className={styles.container}>
+        <Toaster/>
       {
         isEdit ? (
           <h2>Edit Blog</h2>
@@ -134,7 +135,7 @@ useEffect(() => {
           onChange={handleImageUpload}
           className={styles.fileInput}
         />
-        <div className={styles.previewImages}>
+        {/* <div className={styles.previewImages}>
           {images.map((image, index) => (
             <img
               key={index}
@@ -143,7 +144,7 @@ useEffect(() => {
               className={styles.previewImage}
             />
           ))}
-        </div>
+        </div> */}
         <div>
           {images.map((image, index) => (
             <div key={index} className={styles.imageContainer}>
@@ -166,9 +167,10 @@ useEffect(() => {
           className={styles.submitButton}
           >
             {
-              isEdit ? "edit" : "create"
+              isEdit ? "EDIT" : "CREATE"
             }
         </button>
+
       </form>
     </div>
   );
