@@ -1,103 +1,130 @@
+'use client'
+import React, { useState, useEffect } from 'react'
 
-"use client"
-import React, { useState, useEffect } from 'react';
-import styles from './admin.module.css';
-import { Pagination, Table, Form, Button } from 'react-bootstrap';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Toaster, toast } from 'react-hot-toast';
+import styles from './admin.module.css'
+import { Pagination, Table, Form, Button, InputGroup } from 'react-bootstrap'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Toaster, toast } from 'react-hot-toast'
+import useDebouncedValue from '../hooks/useDebounce'
 
-const PAGE_SIZE = 5; // Number of items per page
+const fetcBlogs = async (params) => {
+  if (params) {
+    console.log('params', params)
+    const url = `/api/blogs?title=${params}`
+    const response = await fetch(url)
+    const data = await response.json()
+    return data
+  }
+  const response = await fetch('/api/blogs')
+  const data = await response.json()
+  return data
+}
+
+const PAGE_SIZE = 5 // Number of items per page
 const AdminDashboard = () => {
-  const [blogs, setBlogs] = useState([]);
-  const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [blogs, setBlogs] = useState([])
+  const router = useRouter()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const params = useSearchParams()
+  const debouneValue = useDebouncedValue(searchQuery)
 
- 
-// Filter blogs based on search query
-const filteredBlogs = blogs.filter(
-  (blog) =>
-    blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    blog.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (typeof blog.hashtags === 'string' &&
-      blog.hashtags.toLowerCase().includes(searchQuery.toLowerCase()))
-);
-
-
+  // Filter blogs based on search query
+  const filteredBlogs = blogs.filter(
+    (blog) =>
+      blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      blog.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (typeof blog.hashtags === 'string' &&
+        blog.hashtags.toLowerCase().includes(searchQuery.toLowerCase()))
+  )
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/blogs');
-        const data = await response.json();
-        setBlogs(data);
-      } catch (error) {
-        toast.error('Error fetching blogs:', error);
-      }
-    };
+    // const fetchData = async () => {
+    //   try {
+    //     const response = await fetch('/api/blogs')
+    //     const data = await response.json()
+    //     setBlogs(data)
+    //   } catch (error) {
+    //     toast.error('Error fetching blogs:', error)
+    //   }
+    // }
 
-    fetchData();
-  }, []);
+    // fetchData()
 
-// Calculate pagination values
-  const totalPages = Math.ceil(filteredBlogs.length / PAGE_SIZE);
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const endIndex = startIndex + PAGE_SIZE;
-  const currentBlogs = filteredBlogs.slice(startIndex, endIndex);
+    ;(async () => {
+      const data = await fetcBlogs()
+      setBlogs(data)
+    })()
+  }, [params])
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(filteredBlogs.length / PAGE_SIZE)
+  const startIndex = (currentPage - 1) * PAGE_SIZE
+  const endIndex = startIndex + PAGE_SIZE
+  const currentBlogs = filteredBlogs.slice(startIndex, endIndex)
 
   // Handle page change
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+    setCurrentPage(page)
+  }
 
   // Handle search query change
   const handleSearchQueryChange = (event) => {
-    setSearchQuery(event.target.value);
-    setCurrentPage(1); // Reset to first page when search query changes
-  };
+    setSearchQuery(event.target.value)
+    setCurrentPage(1) // Reset to first page when search query changes
+  }
 
   const handleEdit = (blogId) => {
-    const selectedBlog = blogs.find((blog) => blog._id === blogId);
+    const selectedBlog = blogs.find((blog) => blog._id === blogId)
     if (selectedBlog) {
       setTimeout(() => {
-        router.push('/admin/add?edit=true&id=' + blogId);
-      }, 500);
+        router.push('/admin/add?edit=true&id=' + blogId)
+      }, 500)
     }
-  
   }
+
+  useEffect(() => {
+    ;(async () => {
+      const data = await fetcBlogs(debouneValue)
+      setBlogs(data)
+    })()
+  }, [debouneValue])
 
   const handleDelete = async (blogId) => {
     try {
-      const selectedBlog = blogs.find((blog) => blog._id === blogId);
+      const selectedBlog = blogs.find((blog) => blog._id === blogId)
       if (selectedBlog) {
         const response = await fetch(`/api/blogs/${blogId}`, {
           method: 'DELETE',
-        });
+        })
         if (response.ok) {
-          setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog._id !== blogId));
-          
-          toast.success('Blog deleted successfully');
+          setBlogs((prevBlogs) =>
+            prevBlogs.filter((blog) => blog._id !== blogId)
+          )
+
+          toast.success('Blog deleted successfully')
         } else {
-          toast.error('Error deleting blog');
+          toast.error('Error deleting blog')
         }
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message)
     }
-  };
-  
-  
+  }
+
   return (
     <div className={styles.adminDashboard}>
       <Toaster position="top-center" />
       <div className={styles.headerRow}>
         <h1 className={styles.adminDashboardTitle}>Admin Dashboard</h1>
         <button className={styles.newBlogButton}>
-          <Link href="/admin/add" className={styles.linkButton}>New Blog</Link>
+          <Link href="/admin/add" className={styles.linkButton}>
+            New Blog
+          </Link>
         </button>
       </div>
-  
+
       <h2 className={styles.tableName}>
         Blog Table
         <Form.Control
@@ -108,7 +135,7 @@ const filteredBlogs = blogs.filter(
           className={styles.searchBar}
         />
       </h2>
-  
+
       <Table striped bordered hover className={styles.table}>
         <thead>
           <tr>
@@ -120,16 +147,26 @@ const filteredBlogs = blogs.filter(
           </tr>
         </thead>
         <tbody>
-          {blogs.map((blog,index) => (
+          {blogs.map((blog, index) => (
             <tr key={blog._id}>
-                 <td>{index + 1}</td>
+              <td>{index + 1}</td>
               <td>{blog.title}</td>
               <td>{blog.description}</td>
               <td>{blog.hashtags}</td>
               <td>
                 <div className={styles.buttonGroup}>
-                  <Button className={styles.editButton} onClick={() => handleEdit(blog._id)}>Edit</Button>
-                  <Button className={styles.deleteButton} onClick={() => handleDelete(blog._id)}>Delete</Button>
+                  <Button
+                    className={styles.editButton}
+                    onClick={() => handleEdit(blog._id)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    className={styles.deleteButton}
+                    onClick={() => handleDelete(blog._id)}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </td>
             </tr>
@@ -158,8 +195,7 @@ const filteredBlogs = blogs.filter(
         </Pagination>
       </div>
     </div>
-  );
-  
-};
+  )
+}
 
-export default AdminDashboard;
+export default AdminDashboard
