@@ -1,7 +1,7 @@
-const getBlog = async(id: string) => {
-    const blogs = await fetch('/api/blogs').then(res => res.json())
-    const blog = blogs.find(blog => blog._id === id)
-    return blog
+const getBlog = async (id: string) => {
+  const response = await fetch(`/api/blogs/${id}`)
+  const blog = await response.json()
+  return blog
 }
 
 export default getBlog

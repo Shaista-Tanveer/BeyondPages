@@ -8,7 +8,7 @@ const Blog = () => {
   useEffect(() => {
     fetch('/api/blogs')
       .then((response) => response.json())
-      .then((data) => setBlogs(data))
+      .then((data) => setBlogs(data.blogs))
       .catch((error) => console.log('Error fetching blogs:', error));
   }, []);
 

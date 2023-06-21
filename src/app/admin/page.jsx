@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-
 import styles from './admin.module.css'
 import { Pagination, Table, Form, Button, InputGroup } from 'react-bootstrap'
 import Link from 'next/link'
@@ -8,75 +7,54 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Toaster, toast } from 'react-hot-toast'
 import useDebouncedValue from '../hooks/useDebounce'
 
-const fetcBlogs = async (params) => {
+const fetchBlogs = async (params, page = 1, limit = 10) => {
   if (params) {
-    console.log('params', params)
-    const url = `/api/blogs?title=${params}`
+    const url = `/api/blogs?title=${params}&page=${page}&limit=${limit}`;
     const response = await fetch(url)
     const data = await response.json()
     return data
   }
-  const response = await fetch('/api/blogs')
+  const response = await fetch(`/api/blogs?page=${page}&limit=${limit}`);
   const data = await response.json()
   return data
 }
 
-const PAGE_SIZE = 5 // Number of items per page
+
 const AdminDashboard = () => {
   const [blogs, setBlogs] = useState([])
   const router = useRouter()
-  const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const params = useSearchParams()
   const debouneValue = useDebouncedValue(searchQuery)
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+ 
 
-  // Filter blogs based on search query
-  const filteredBlogs = blogs.filter(
-    (blog) =>
-      blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blog.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (typeof blog.hashtags === 'string' &&
-        blog.hashtags.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+ useEffect(() => {
+  (async () => {
+    const data = await fetchBlogs(debouneValue, page, limit);
+    setBlogs(data.blogs);
+    setTotalPages(data.totalPages);
+  })();
+}, [debouneValue, page, limit]);
+  
 
-  useEffect(() => {
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await fetch('/api/blogs')
-    //     const data = await response.json()
-    //     setBlogs(data)
-    //   } catch (error) {
-    //     toast.error('Error fetching blogs:', error)
-    //   }
-    // }
 
-    // fetchData()
-
-    ;(async () => {
-      const data = await fetcBlogs()
-      setBlogs(data)
-    })()
-  }, [params])
-
-  // Calculate pagination values
-  const totalPages = Math.ceil(filteredBlogs.length / PAGE_SIZE)
-  const startIndex = (currentPage - 1) * PAGE_SIZE
-  const endIndex = startIndex + PAGE_SIZE
-  const currentBlogs = filteredBlogs.slice(startIndex, endIndex)
-
-  // Handle page change
-  const handlePageChange = (page) => {
-    setCurrentPage(page)
-  }
-
-  // Handle search query change
   const handleSearchQueryChange = (event) => {
     setSearchQuery(event.target.value)
-    setCurrentPage(1) // Reset to first page when search query changes
+    
   }
+  const handlePageChange = async (selectedPage) => {
+    setPage(selectedPage);
+    const data = await fetchBlogs(debouneValue, selectedPage, limit);
+    setBlogs(data.blogs); 
+  };
+  
 
   const handleEdit = (blogId) => {
     const selectedBlog = blogs.find((blog) => blog._id === blogId)
+    console.log(selectedBlog,"selectedBlog");
     if (selectedBlog) {
       setTimeout(() => {
         router.push('/admin/add?edit=true&id=' + blogId)
@@ -84,12 +62,6 @@ const AdminDashboard = () => {
     }
   }
 
-  useEffect(() => {
-    ;(async () => {
-      const data = await fetcBlogs(debouneValue)
-      setBlogs(data)
-    })()
-  }, [debouneValue])
 
   const handleDelete = async (blogId) => {
     try {
@@ -174,25 +146,18 @@ const AdminDashboard = () => {
         </tbody>
       </Table>
       <div className={styles.pagination}>
-        <Pagination>
-          <Pagination.Prev
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          />
-          {Array.from({ length: totalPages }, (_, index) => (
-            <Pagination.Item
-              key={index + 1}
-              active={index + 1 === currentPage}
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          />
-        </Pagination>
+      <Pagination>
+  <Pagination.First onClick={() => handlePageChange(1)} />
+  <Pagination.Prev
+    onClick={() => handlePageChange(Math.max(1, page - 1))}
+    disabled={page === 1}
+  />
+  <Pagination.Item active>{page}</Pagination.Item>
+  <Pagination.Next onClick={() => handlePageChange(page + 1)} />
+  <Pagination.Last onClick={() => handlePageChange(totalPages)} />
+
+</Pagination>
+
       </div>
     </div>
   )

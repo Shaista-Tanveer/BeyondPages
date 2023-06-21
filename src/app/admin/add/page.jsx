@@ -45,6 +45,7 @@ console.log(isEdit,"isEdit");
   
       if (isEdit) {
         const id = params.get('id');
+        console.log(id,"got in edit ");
         const response = await fetch(`/api/blogs/${id}`, requestOptions);
   
         if (response.ok) {
