@@ -11,7 +11,7 @@ const BlogSchema = new Schema({
         type: [String],
     },
     images: {
-        type: [String],
+        type: String,
     },
     createdAt: {
         type: Date,

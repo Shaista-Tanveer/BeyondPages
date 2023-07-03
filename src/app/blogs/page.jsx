@@ -16,7 +16,7 @@ const Blog = () => {
     <div className={styles.blogsContainer}>
       {blogs.map((blog) => (
         <div key={blog._id} className={styles.blogCard}>
-          <img src={blog.image} alt="Blog" className={styles.blogImage} />
+          <img src={blog.images} alt="Blog" className={styles.blogImage} />
           <h2 className={styles.blogTitle}>{blog.title}</h2>
           <p className={styles.blogDescription}>{blog.description}</p>
           <div className={styles.blogTags}>

@@ -20,7 +20,7 @@ export const GET = async (request, { params }) => {
 export const PATCH = async (request, { params }) => {
     try {
         await connectToDB();
-        const { title, description, hashtags } = await request.json();
+        const { title, description, hashtags, imageUrl } = await request.json();
 
         const existingBlog = await Blog.findById(params.id);
         console.log(params.id, "params.id");
@@ -30,6 +30,7 @@ export const PATCH = async (request, { params }) => {
         existingBlog.title = title;
         existingBlog.description = description;
         existingBlog.hashtags = hashtags;
+        existingBlog.images = imageUrl;
         await existingBlog.save();
 
         return new Response('Successfully updated the Blog', { status: 200 });

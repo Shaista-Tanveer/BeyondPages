@@ -1,0 +1,31 @@
+.blog-container {
+  margin: 20px;
+}
+
+.blog-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.blog-description {
+  margin-top: 10px;
+}
+
+.blog-image {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin-top: 20px;
+}
+
+.blog-hashtags {
+  margin-top: 20px;
+}
+
+.blog-hashtag {
+  display: inline-block;
+  margin-right: 5px;
+  padding: 5px 10px;
+  background-color: #ccc;
+  border-radius: 4px;
+}

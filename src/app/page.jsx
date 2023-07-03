@@ -1,11 +1,19 @@
-// HomePage.js
+"use client"
 import Image from 'next/image';
 import styles from './page.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-
 const HomePage = () => {
+  const [blogs, setBlogs] = useState([]);
+const [image,setImage]=useState('');
+  useEffect(() => {
+    fetch('/api/blogs')
+      .then((response) => response.json())
+      .then((data) => setBlogs(data.blogs))
+      .catch((error) => console.log('Error fetching blogs:', error));
+  }, []);
+
   return (
     <div className={styles.container}>
       <section className={styles.hero}>
@@ -24,22 +32,16 @@ const HomePage = () => {
       <section className={styles.featuredBlogs}>
         <h2>Featured Blogs</h2>
         <div className={styles.blogList}>
-          <div className={styles.blogCard}>
-            <Image src="/meal.png" alt="Blog 1" width={300} height={200} />
-            <h3>Blog Title 1</h3>
-            <p>Summary of the blog post content...</p>
-            <Link href="/">
-              <span className={styles.btn}>Read More</span>
-            </Link>
-          </div>
-          <div className={styles.blogCard}>
-            <Image src="/pie.png" alt="Blog 2" width={300} height={200} />
-            <h3>Blog Title 2</h3>
-            <p>Summary of the blog post content...</p>
-            <Link href="/blog/2">
-              <span className={styles.btn}>Read More</span>
-            </Link>
-          </div>
+          {blogs.map((blog) => (
+            <div key={blog.id} className={styles.blogCard}>
+          <Image src={blog.images} alt={blog.title} width={300} height={200} />
+              <h3>{blog.title}</h3>
+              <p>{blog.summary}</p>
+              <Link href={`/blog/${blog._id}`}>
+                <span className={styles.btn}>Read More</span>
+              </Link>
+            </div>
+          ))}
         </div>
         <Link href="/blogs">
           <span className={styles.btn}>View All Blogs</span>
